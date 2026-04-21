@@ -1,3 +1,4 @@
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 ## Palm project overview
 
 `A03_Palm_census.ipynb` is the first palm post-processing notebook in the pipeline. It takes raw ML detection output (bounding box CSVs + tiled GeoTIFF imagery) and produces geolocated palm points clipped to a defined block boundary, with deduplication and a final palm count.
