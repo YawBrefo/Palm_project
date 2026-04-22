@@ -69,7 +69,7 @@ Each point includes: `Plant_id`, `block_id`, `lat`, `long`, `diameter` (m, cappe
 input_image_dir    = '.../count/count_image_tiles/'
 input_csv_dir      = '.../count/count_ML_output/'
 input_boundary_dir = '.../boundary_data/geojson_data/'
-input_block_id     = 1
+input_block_id     = 1 # number of blocks
 
 post_processing = Census(input_image_dir, input_csv_dir, input_boundary_dir, input_block_id)
 post_processing.process()
@@ -154,7 +154,7 @@ Identifies planting gaps in the palm point distribution using Delaunay triangula
 | `count_path` | Directory containing palm count GeoJSON files | `.../Project_folder/GeoTIFF_images/` |
 | `boundary_path` | Directory containing AOI boundary polygon files | `.../Project_folder/polygon_data/` |
 
-Count files and boundary files are matched by filename: the word `count` in the count filename is replaced with `boundary` to locate the corresponding boundary file (e.g. `block1_count.geojson` → `block1_boundary.geojson`).
+Count files and boundary files are matched by filename: the word `count` in the count filename is replaced with `boundary` to locate the corresponding boundary file (e.g. `block_num_count.geojson` → `block_num_boundary.geojson`).
 
 ### Outputs
 
