@@ -1,6 +1,6 @@
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 
-## Palm project overview
+##  Palm project overview
 
 The palm census pipeline spans three notebooks that take raw ML detection output through geolocation, post-QA standardisation, and automated blank spot generation:
 
@@ -11,7 +11,10 @@ The palm census pipeline spans three notebooks that take raw ML detection output
 | 2 | `count_clean.ipynb` | Post-QA standardisation of palm point files |
 | 3 | `B01_blankspot_point_generator.ipynb` | Identify and fill planting gaps using Delaunay triangulation |
 
-## Pipeline Position
+---
+
+<details>
+<summary><strong>Pipeline Position</strong></summary>
 
 ```
 Raw Boundary File (.kml / .kmz / .shp / .gpkg / .geojson)
@@ -35,9 +38,12 @@ ML Detection Output (CSVs + GeoTIFFs)
   Blankspot_files/<block>_blankspot.geojson
 ```
 
+</details>
+
 ---
 
-## 0. boundary_processor.py
+<details>
+<summary><strong>0. boundary_processor.py</strong> — standardise boundary vector to GeoJSON</summary>
 
 Converts any client-supplied boundary vector file into a standardised GeoJSON that the downstream census notebooks expect. Handles KMZ decompression, KML namespace parsing, Z-coordinate stripping, and ring closure.
 
@@ -90,9 +96,12 @@ geojson_file = boundary.vector_converter()
 geopandas, pathlib, zipfile, tempfile, xml.etree.ElementTree
 ```
 
+</details>
+
 ---
 
-## 1. Tree_census.ipynb
+<details>
+<summary><strong>1. Tree_census.ipynb</strong> — geolocate & deduplicate ML detections</summary>
 
 Converts ML detection CSVs and paired GeoTIFF tiles into a single deduplicated, boundary-clipped GeoJSON of palm points.
 
@@ -144,9 +153,12 @@ post_processing.process()
 rasterio, pandas, geopandas, numpy, scikit-learn, pathlib
 ```
 
+</details>
+
 ---
 
-## 2. count_clean.ipynb
+<details>
+<summary><strong>2. count_clean.ipynb</strong> — post-QA standardisation</summary>
 
 Standardises QA-validated palm point files after manual review and separates blank-spot records by block.
 
@@ -204,9 +216,12 @@ value_(blankspot_dir, block_blankspot_dir)
 geopandas, pathlib
 ```
 
+</details>
+
 ---
 
-## 3. B01_blankspot_point_generator.ipynb
+<details>
+<summary><strong>3. B01_blankspot_point_generator.ipynb</strong> — blank spot detection & fill</summary>
 
 Identifies planting gaps in the palm point distribution using Delaunay triangulation and generates new candidate points to fill those gaps.
 
@@ -254,5 +269,7 @@ generator.execute_class()
 ```
 geopandas, pandas, numpy, scipy, shapely, scikit-learn, pathlib, collections
 ```
+
+</details>
 
 
