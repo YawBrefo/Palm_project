@@ -1,10 +1,12 @@
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
 ## Palm project overview
 
 The palm census pipeline spans three notebooks that take raw ML detection output through geolocation, post-QA standardisation, and automated blank spot generation:
 
-| Step | Notebook | Purpose |
+| Step | Script / Notebook | Purpose |
 |---|---|---|
+| 0 | `boundary_processor.py` | Convert any boundary vector format (.kml, .kmz, .shp, .gpkg, .geojson) to standardised GeoJSON |
 | 1 | `Tree_census.ipynb` | Geolocate ML detections, deduplicate, clip to block boundary |
 | 2 | `count_clean.ipynb` | Post-QA standardisation of palm point files |
 | 3 | `B01_blankspot_point_generator.ipynb` | Identify and fill planting gaps using Delaunay triangulation |
@@ -12,6 +14,12 @@ The palm census pipeline spans three notebooks that take raw ML detection output
 ## Pipeline Position
 
 ```
+Raw Boundary File (.kml / .kmz / .shp / .gpkg / .geojson)
+        ↓
+  boundary_processor.py                 ← standardise boundary to GeoJSON
+        ↓
+  boundary_data/geojson_data/<block>.geojson
+        ↓
 ML Detection Output (CSVs + GeoTIFFs)
         ↓
   Tree_census.ipynb                     ← geolocation & deduplication
@@ -25,6 +33,61 @@ ML Detection Output (CSVs + GeoTIFFs)
   B01_blankspot_point_generator.ipynb   ← blank spot detection & fill
         ↓
   Blankspot_files/<block>_blankspot.geojson
+```
+
+---
+
+## 0. boundary_processor.py
+
+Converts any client-supplied boundary vector file into a standardised GeoJSON that the downstream census notebooks expect. Handles KMZ decompression, KML namespace parsing, Z-coordinate stripping, and ring closure.
+
+### Supported Input Formats
+
+| Extension | Conversion path |
+|---|---|
+| `.gpkg` | Read with GeoPandas → GeoJSON |
+| `.shp` | Read with GeoPandas → GeoJSON |
+| `.geojson` | Clean & standardise (strip Z, close rings) → GeoJSON |
+| `.kml` | Custom XML parser → GeoJSON |
+| `.kmz` | Decompress to `.kml` → custom XML parser → GeoJSON |
+
+### Inputs
+
+| Parameter | Description | Example |
+|---|---|---|
+| `in_boundary_file` | Path to any supported boundary vector file | `'../blocks/block1.kmz'` |
+
+### Outputs
+
+| File | Description |
+|---|---|
+| `<stem>.geojson` | Standardised GeoJSON FeatureCollection with 2D coordinates and closed rings |
+
+### Class Methods
+
+**`vector_converter()`** — main entry point; dispatches to the appropriate converter based on file extension and returns the output GeoJSON path.
+
+**`shp_gpkg_to_geojson(boundary_file, output_dir)`** — reads `.shp` or `.gpkg` via GeoPandas and writes GeoJSON.
+
+**`convert_kml_to_geojson_custom(kml_file)`** — custom XML parser; extracts `Placemark` polygons, closes rings, and returns a GeoJSON `FeatureCollection` dict.
+
+**`standardize_geojson(geojson_data, output_dir)`** — strips Z-coordinates from `Polygon` and `MultiPolygon` rings, ensures closure, and writes GeoJSON.
+
+**`extract_kmz(kmz_file, output_dir)`** — decompresses a `.kmz` archive and returns the path to the extracted `.kml` file.
+
+### Usage
+
+```python
+from boundary_processor import process_boundary
+
+boundary = process_boundary('../boundary_data/block1.kmz')
+geojson_file = boundary.vector_converter()
+```
+
+### Dependencies
+
+```
+geopandas, pathlib, zipfile, tempfile, xml.etree.ElementTree
 ```
 
 ---
@@ -69,7 +132,7 @@ Each point includes: `Plant_id`, `block_id`, `lat`, `long`, `diameter` (m, cappe
 input_image_dir    = '.../count/count_image_tiles/'
 input_csv_dir      = '.../count/count_ML_output/'
 input_boundary_dir = '.../boundary_data/geojson_data/'
-input_block_id     = 1 # number of blocks
+input_block_id     = 1
 
 post_processing = Census(input_image_dir, input_csv_dir, input_boundary_dir, input_block_id)
 post_processing.process()
@@ -154,7 +217,7 @@ Identifies planting gaps in the palm point distribution using Delaunay triangula
 | `count_path` | Directory containing palm count GeoJSON files | `.../Project_folder/GeoTIFF_images/` |
 | `boundary_path` | Directory containing AOI boundary polygon files | `.../Project_folder/polygon_data/` |
 
-Count files and boundary files are matched by filename: the word `count` in the count filename is replaced with `boundary` to locate the corresponding boundary file (e.g. `block_num_count.geojson` → `block_num_boundary.geojson`).
+Count files and boundary files are matched by filename: the word `count` in the count filename is replaced with `boundary` to locate the corresponding boundary file (e.g. `block1_count.geojson` → `block1_boundary.geojson`).
 
 ### Outputs
 
