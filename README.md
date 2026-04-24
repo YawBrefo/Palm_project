@@ -10,6 +10,7 @@ The palm census pipeline spans three notebooks that take raw ML detection output
 | 1 | `Tree_census.ipynb` | Geolocate ML detections, deduplicate, clip to block boundary |
 | 2 | `count_clean.ipynb` | Post-QA standardisation of palm point files |
 | 3 | `B01_blankspot_point_generator.ipynb` | Identify and fill planting gaps using Delaunay triangulation |
+| 4 | `blankspot_post_cleaning.ipynb` | Post-QA standardisation of blank spot point files |
 
 ---
 
@@ -36,6 +37,10 @@ ML Detection Output (CSVs + GeoTIFFs)
   B01_blankspot_point_generator.ipynb   ← blank spot detection & fill
         ↓
   Blankspot_files/<block>_blankspot.geojson
+        ↓  (manual QA / visualisation)
+  blankspot_post_cleaning.ipynb         ← post-QA standardisation of blank spots
+        ↓
+  blankspot_post_QA/final_blankspot_points.geojson
 ```
 
 </details>
@@ -262,6 +267,57 @@ boundary_path = '.../Project_folder/polygon_data/'
 
 generator = BlankspotGenerator(count_path, boundary_path)
 generator.execute_class()
+```
+
+### Dependencies
+
+```
+geopandas, pandas, numpy, scipy, shapely, scikit-learn, pathlib, collections
+```
+
+</details>
+
+---
+
+<details>
+<summary><strong>4. blankspot_post_cleaning.ipynb</strong> — post-QA standardisation of blank spot files</summary>
+
+Standardises QA-validated blank spot point files after manual review, mirroring the role that `count_clean.ipynb` plays for palm count files.
+
+### Inputs
+
+| Parameter | Description | Example |
+|---|---|---|
+| `blank_dir` | Path to the QA-validated blank spot GeoJSON file | `.../Project_files/post_QA_blankspots.geojson` |
+| `blk_number` | Block identifier string | `'1'` |
+| `dest_dir` | Output directory for the cleaned file | `.../blankspot/blankspot_post_QA/` |
+
+### Outputs
+
+| File | Location | Description |
+|---|---|---|
+| `final_blankspot_points.geojson` | `dest_dir` | Cleaned, standardised blank spot point file |
+
+### Processing Steps
+
+**`blankspot_edit(blank_dir, blk_number, dest_dir)`**
+
+1. Reads the QA-validated blank spot GeoJSON.
+2. Removes duplicate geometries.
+3. Assigns sequential `Plant_id` values (1-based string).
+4. Populates missing `lat`/`lon` from point geometry.
+5. Reconstructs geometry from `lon`/`lat` columns.
+6. Assigns `block` identifier to all rows.
+7. Saves output as `final_blankspot_points.geojson`.
+
+### Usage
+
+```python
+blank_dir  = '.../Project_files/post_QA_blankspots.geojson'
+blk_number = '1'
+dest_dir   = '.../blankspot/blankspot_post_QA/'
+
+blankspot_edit(blank_dir, blk_number, dest_dir)
 ```
 
 ### Dependencies
