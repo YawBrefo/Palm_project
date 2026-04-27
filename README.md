@@ -43,7 +43,7 @@ ML Detection Output (CSVs + GeoTIFFs)
         ↓
   blankspot_post_QA/final_blankspot_points.geojson
         ↓
-  C01_cultivated_uncultivated_summary.ipynb  ← cultivated / uncultivated area summary
+  cultivated_summary.ipynb  ← cultivated / uncultivated area summary
         ↓
   block_summary_outputs/<block>.json
   block_summary_outputs/all_blocks.json
