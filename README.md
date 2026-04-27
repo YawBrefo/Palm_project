@@ -11,7 +11,7 @@ The palm census pipeline spans three notebooks that take raw ML detection output
 | 2 | `count_clean.ipynb` | Post-QA standardisation of palm point files |
 | 3 | `B01_blankspot_point_generator.ipynb` | Identify and fill planting gaps using Delaunay triangulation |
 | 4 | `blankspot_post_cleaning.ipynb` | Post-QA standardisation of blank spot point files |
-| 5 | `C01_cultivated_uncultivated_summary.ipynb` | Compute cultivated / uncultivated area and generate per-block summary JSON files |
+| 5 | `cultivated_summary.ipynb` | Compute cultivated area and generate per-block summary JSON files |
 
 ---
 
