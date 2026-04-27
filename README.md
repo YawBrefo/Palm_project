@@ -336,9 +336,9 @@ geopandas
 ---
 
 <details>
-<summary><strong>5. C01_cultivated_uncultivated_summary.ipynb</strong> — cultivated / uncultivated area summary</summary>
+<summary><strong>5. cultivated_summary.ipynb</strong> — cultivated area summary</summary>
 
-Computes cultivated and uncultivated area per block by pairing QA-validated palm count and blank spot files with their block boundaries, then saves a JSON summary for each block and one combined `all_blocks.json`.
+Computes cultivated area per block by pairing QA-validated palm count and blank spot files with their block boundaries, then saves a JSON summary for each block and one combined `all_blocks.json`.
 
 ### Inputs
 
