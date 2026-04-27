@@ -11,6 +11,7 @@ The palm census pipeline spans three notebooks that take raw ML detection output
 | 2 | `count_clean.ipynb` | Post-QA standardisation of palm point files |
 | 3 | `B01_blankspot_point_generator.ipynb` | Identify and fill planting gaps using Delaunay triangulation |
 | 4 | `blankspot_post_cleaning.ipynb` | Post-QA standardisation of blank spot point files |
+| 5 | `C01_cultivated_uncultivated_summary.ipynb` | Compute cultivated / uncultivated area and generate per-block summary JSON files |
 
 ---
 
@@ -41,6 +42,11 @@ ML Detection Output (CSVs + GeoTIFFs)
   blankspot_post_cleaning.ipynb         ← post-QA standardisation of blank spots
         ↓
   blankspot_post_QA/final_blankspot_points.geojson
+        ↓
+  C01_cultivated_uncultivated_summary.ipynb  ← cultivated / uncultivated area summary
+        ↓
+  block_summary_outputs/<block>.json
+  block_summary_outputs/all_blocks.json
 ```
 
 </details>
@@ -281,7 +287,6 @@ geopandas, pandas, numpy, scipy, shapely, scikit-learn, pathlib, collections
 
 <details>
 <summary><strong>4. blankspot_post_cleaning.ipynb</strong> — post-QA standardisation of blank spot files</summary>
-
 Standardises QA-validated blank spot point files after manual review, mirroring the role that `count_clean.ipynb` plays for palm count files.
 
 ### Inputs
@@ -323,7 +328,66 @@ blankspot_edit(blank_dir, blk_number, dest_dir)
 ### Dependencies
 
 ```
-geopandas, pandas, numpy, scipy, shapely, scikit-learn, pathlib, collections
+geopandas
+```
+
+</details>
+
+---
+
+<details>
+<summary><strong>5. C01_cultivated_uncultivated_summary.ipynb</strong> — cultivated / uncultivated area summary</summary>
+
+Computes cultivated and uncultivated area per block by pairing QA-validated palm count and blank spot files with their block boundaries, then saves a JSON summary for each block and one combined `all_blocks.json`.
+
+### Inputs
+
+| Parameter | Description | Example |
+|---|---|---|
+| `boundary_dir` | Directory of block boundary GeoJSON files | `.../block_boundaries/` |
+| `count_dir` | Directory of post-QA palm count GeoJSON files | `.../QA_count/` |
+| `blankspot_dir` | Directory of post-QA blank spot GeoJSON files (optional) | `.../QA_blankspot/` |
+| `palm_density` | Known planting density (palms/ha); set to `None` to auto-compute | `143` or `None` |
+
+Boundary and point files are matched spatially: a point file is paired with the boundary that contains ≥ 99 % of its points.
+
+### Outputs
+
+| File | Location | Description |
+|---|---|---|
+| `<block>.json` | `<count_dir>/../block_summary_outputs/` | Per-block summary (area, counts, cultivated/uncultivated breakdown) |
+| `all_blocks.json` | `<count_dir>/../block_summary_outputs/` | Aggregate summary across all blocks |
+
+Each JSON includes: `Name`, `Block_area (ha)`, `Tree_count`, `Stand_per_ha`, `Blankspot_count`, `Cultivated_area (ha)`, `Uncultivated_area (ha)`, and any block properties (`Code`, `Year`, `Division`) found in the boundary file.
+
+### Processing Steps
+
+**`boundary_points_pairs()`** — spatially matches each boundary file to the point file whose points fall ≥ 99 % within it, using a spatial join.
+
+**`block_properties()`** — reads `Code`, `Year`, and `Division` fields from the boundary GeoJSON properties if present.
+
+**`point_triangulation()`** — builds a Delaunay triangulation over the count points (max side length 13 units) and dissolves the triangles to estimate the planted area in hectares. Used when `palm_density` is `None`.
+
+**`compute_plant_density()`** — divides the count of points within the boundary polygon by the triangulated planted area to derive density (palms/ha).
+
+**`process()`** — iterates all boundary/point pairs, computes per-block metrics, writes per-block JSON files, and writes the combined `all_blocks.json`.
+
+### Usage
+
+```python
+boundary_dir     = '.../block_boundaries/'
+count_dir        = '.../QA_count/'
+blankspot_dir    = '.../QA_blankspot/'  # set to None to skip uncultivated area
+planting_density = None                 # or supply a known value, e.g. 143
+
+post_processing = Cultivation_Summary1(boundary_dir, count_dir, planting_density, blankspot_dir)
+post_processing.process()
+```
+
+### Dependencies
+
+```
+geopandas, numpy, scipy, shapely, pathlib, json
 ```
 
 </details>
