@@ -56,7 +56,7 @@ ML Detection Output (CSVs + GeoTIFFs)
 <details>
 <summary><strong>0. boundary_processor.py</strong> — standardise boundary vector to GeoJSON</summary>
 
-Converts any client-supplied boundary vector file into a standardised GeoJSON that the downstream census notebooks expect. Handles KMZ decompression, KML namespace parsing, Z-coordinate stripping, and ring closure.
+Converts any client supplied boundary vector file into a standardised GeoJSON that the downstream census notebooks expect. Handles KMZ decompression, KML namespace parsing, Z-coordinate stripping, and ring closure.
 
 ### Supported Input Formats
 
