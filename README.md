@@ -4,7 +4,7 @@
 
 The palm census pipeline spans three notebooks that take raw ML detection output through geolocation, post-QA standardisation, and automated blank spot generation:
 
-| Step | Script / Notebook | Purpose |
+| Step | Scripts / Notebooks | Purpose |
 |---|---|---|
 | 0 | `boundary_processor.py` | Convert any boundary vector format (.kml, .kmz, .shp, .gpkg, .geojson) to standardised GeoJSON |
 | 1 | `Tree_census.ipynb` | Geolocate ML detections, deduplicate, clip to block boundary |
