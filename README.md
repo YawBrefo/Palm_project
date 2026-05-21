@@ -15,7 +15,7 @@ The palm census pipeline spans three notebooks that take raw ML detection output
 
 ---
 
-<all_details>
+<details>
 <summary><strong>Pipeline Position</strong></summary>
 
 ```
