@@ -2,7 +2,7 @@
 
 ##  Palm project overview
 
-The palm census pipeline spans three notebooks that take raw ML detection output through geolocation, post-QA standardisation, and automated blank spot generation:
+The palm census pipeline spans three notebooks that take raw ML detection output through geolocation, post-QA standardisation and automated blank spot generation:
 
 | Step | Scripts / Notebooks | Purpose |
 |---|---|---|
