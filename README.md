@@ -7,7 +7,7 @@ This palm census pipeline spans three notebooks that take raw ML detection outpu
 | Step | Scripts / Notebooks | Purpose |
 |---|---|---|
 | 0 | `boundary_processor.py` | Convert any boundary vector format (.kml, .kmz, .shp, .gpkg, .geojson) to standardised GeoJSON |
-| 1 | `Tree_census.ipynb` | Geolocate ML detections, deduplicate, clip to block boundary |
+| 1 | `Tree_census.ipynb` | Geolocate ML detections, deduplicate and clip to block boundary |
 | 2 | `count_clean.ipynb` | Post-QA standardisation of palm point files |
 | 3 | `B01_blankspot_point_generator.ipynb` | Identify and fill planting gaps using Delaunay triangulation |
 | 4 | `blankspot_post_cleaning.ipynb` | Post-QA standardisation of blank spot point files |
